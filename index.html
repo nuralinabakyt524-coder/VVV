@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>№8 зертханалық тәжірибе — Кальцийдің сумен және қышқыл ерітіндісімен әрекеттесуі</title>
+<style>
+:root{
+  --bg:#f4fbfa;--card:#ffffff;--ink:#183b3f;--muted:#60797c;--line:#c9e1dd;
+  --accent:#2f9f8f;--accent2:#66c4b4;--good:#23834c;--bad:#bb4141;--warn:#966400;
+  --soft:#e7f6f2;--soft2:#f4fbf9;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.45}
+button,select,input,textarea{font:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.5}
+.wrap{max-width:1460px;margin:auto;padding:14px}
+.hero{background:linear-gradient(135deg,#164f58,#2f9f8f);color:#fff;border-radius:22px;padding:20px;box-shadow:0 12px 30px rgba(16,73,78,.15)}
+.hero h1{margin:0 0 6px;font-size:clamp(23px,3vw,37px)}
+.hero p{margin:5px 0;color:#e8fbf8}
+.author{font-weight:800;margin-top:8px!important;color:#fff!important}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.lang{display:flex;gap:6px;padding:6px;border-radius:12px;background:rgba(255,255,255,.13)}
+.lang button{border:1px solid rgba(255,255,255,.36);background:transparent;color:white;border-radius:8px;padding:8px 11px}
+.lang button.active{background:#fff;color:#174d54;font-weight:800}
+.badges{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.badge{padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);font-size:13px}
+.notice{margin-top:12px;background:#fff8e9;border:1px solid #e9d29e;color:#765100;border-radius:12px;padding:10px 12px}
+.progress{margin-top:13px;background:white;border:1px solid var(--line);border-radius:15px;padding:11px}
+.progressbar{height:9px;background:#e6efed;border-radius:999px;overflow:hidden;margin-top:7px}
+.progressbar>div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .2s}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 4px 15px rgba(19,70,73,.05)}
+.section{margin-top:15px}
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(360px,.65fr);gap:15px}
+@media(max-width:1050px){.grid{grid-template-columns:1fr}}
+.title{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.title h2{margin:0;font-size:20px}
+.num{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--soft);color:#107567;font-weight:900}
+.btn{border:1px solid #b7d3ce;background:#fff;color:var(--ink);border-radius:10px;padding:9px 12px;min-height:42px}
+.btn:hover{background:#f2fbf9}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.good{background:var(--good);border-color:var(--good);color:#fff}
+.btn.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+.row{display:flex;gap:7px;flex-wrap:wrap}
+.sceneShell{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#deefec;position:relative}
+#scene3d{height:700px;min-height:500px;position:relative}
+#scene3d canvas{display:block;width:100%!important;height:100%!important;touch-action:none}
+.sceneOverlay{position:absolute;left:10px;right:10px;top:10px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+.chip{pointer-events:auto;background:rgba(255,255,255,.92);border:1px solid #bdd7d2;border-radius:999px;padding:6px 10px;font-size:12px}
+.controls{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+@media(max-width:900px){.controls{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.controls{grid-template-columns:1fr}#scene3d{height:500px}}
+.control{border:1px solid var(--line);border-radius:12px;padding:9px;background:#fff}
+.control label{display:block;font-size:12px;font-weight:800;color:var(--muted);margin-bottom:5px}
+input[type=range]{width:100%}
+select,input[type=text],textarea{width:100%;border:1px solid #b9d0cc;border-radius:9px;padding:9px;background:#fff;color:var(--ink)}
+textarea{min-height:88px;resize:vertical}
+.status{margin-top:9px;border:1px solid var(--line);background:#f8fcfb;border-radius:10px;padding:9px 11px;min-height:42px}
+.status.good{background:#edf8f0;border-color:#a5d4b3;color:#176636}
+.status.bad{background:#fff1f1;border-color:#e1abab;color:#923232}
+.status.warn{background:#fff8e9;border-color:#e5cea0;color:#795200}
+.small{font-size:13px;color:var(--muted)}
+.tablewrap{overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border:1px solid var(--line);padding:7px;vertical-align:top}
+th{background:#eaf7f4;text-align:left}
+.desc td:last-child,.desc th:last-child{text-align:center;width:70px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kpis div{border:1px solid var(--line);border-radius:11px;padding:9px;text-align:center;background:#fbfefd}
+.kpis b{display:block;font-size:20px}
+.rate{height:14px;border-radius:999px;background:#e8efed;overflow:hidden}
+.rate>div{height:100%;width:0;transition:width .4s}
+.rate.water>div{background:#70b6dc}
+.rate.acid>div{background:#e68665}
+.eqboard{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:760px){.eqboard{grid-template-columns:1fr}}
+.bank,.slots{border:1px dashed #a7c8c2;border-radius:14px;padding:10px;background:#fbfefd}
+.token{display:inline-block;border:1px solid #b9d2cd;background:#fff;border-radius:10px;padding:9px 11px;margin:5px;user-select:none}
+.token.selected{outline:3px solid rgba(47,159,143,.16);border-color:var(--accent)}
+.slot{min-height:50px;border:2px dashed #b6cdc8;border-radius:10px;padding:7px;margin:6px 0;background:#fff}
+.slot.correct{border-color:#78bc92;background:#eff9f2}
+.slot.wrong{border-color:#d28787;background:#fff2f2}
+.hidden{display:none!important}
+.result{border:2px solid #bad7d1;background:#f8fcfb;border-radius:15px;padding:14px}
+.bigscore{font-size:44px;font-weight:900;line-height:1}
+.contacts{margin-top:15px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.contactCard{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:#fbfefd;font-weight:700}
+.contactIcon{font-size:22px}
+.contactValue{color:var(--accent)}
+.tubeLegend{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.tubeLegend span{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:#fff}
+footer{margin:18px 0 8px;text-align:center;color:var(--muted);font-size:12px}
+@media print{
+ .no-print,.sceneShell{display:none!important}
+ body{background:#fff}.hero{background:#fff;color:#000;border:1px solid #aaa;box-shadow:none}.hero p,.author{color:#000!important}.card{box-shadow:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+<header class="hero">
+  <div class="top">
+    <div>
+      <h1 data-i="title">№8 зертханалық тәжірибе</h1>
+      <p><strong data-i="topic">Кальцийдің сумен және қышқыл ерітіндісімен әрекеттесуі</strong></p>
+      <p data-i="subtitle">Интерактивті 3D виртуалды зертхана</p>
+      <p class="author">Автор: НУРАЛИНА Б.А.</p>
+    </div>
+    <div class="lang no-print">
+      <button id="kzBtn" class="active" type="button">ҚАЗ</button>
+      <button id="ruBtn" type="button">RU</button>
+    </div>
+  </div>
+  <div class="badges">
+    <span class="badge" data-i="b1">2 тәуелсіз Ca үлгісі</span>
+    <span class="badge" data-i="b2">Қолмен 3D жылжыту</span>
+    <span class="badge" data-i="b3">50–200% масштаб</span>
+    <span class="badge" data-i="b4">Жалпы 10 балл</span>
+  </div>
+</header>
+
+<div class="notice" data-i="virtualOnly">
+Бұл тек виртуалды оқу симуляциясы. Ол нақты қышқылдармен немесе басқа реактивтермен жұмыс істеуге арналған практикалық нұсқаулық емес.
+</div>
+
+<div class="progress no-print">
+  <div style="display:flex;justify-content:space-between;gap:10px"><strong data-i="progress">Орындалу барысы</strong><span id="progressText">0%</span></div>
+  <div class="progressbar"><div id="progressFill"></div></div>
+</div>
+
+<section class="card section desc">
+  <div class="title"><span class="num">✓</span><h2 data-i="descTitle">Бағалау критерийлері мен дескрипторлар</h2></div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th data-i="criterion">Бағалау критерийі</th><th data-i="descriptor">Дескриптор</th><th data-i="points">Балл</th></tr></thead>
+      <tbody>
+        <tr><td data-i="d1c">Қауіпсіздік</td><td data-i="d1">Виртуалды қорғаныш көзілдірігі мен қолғапты таңдайды.</td><td>1</td></tr>
+        <tr><td data-i="d2c">Ca + H₂O тәжірибесі</td><td data-i="d2">Ca_WATER үлгісімен газ бөлінуін, Ca(OH)₂ түзілуін және индикатор түсінің өзгеруін анықтайды.</td><td>2</td></tr>
+        <tr><td data-i="d3c">Ca + HCl тәжірибесі</td><td data-i="d3">Ca_ACID үлгісімен H₂ бөлінуін және CaCl₂ түзілуін анықтайды.</td><td>2</td></tr>
+        <tr><td data-i="d4c">Реакция қарқындылығын салыстырады</td><td data-i="d4">Қышқылмен реакцияның жылдамырақ жүруін анықтап, себебін түсіндіреді.</td><td>1</td></tr>
+        <tr><td data-i="d5c">Теңдеулерді құрады</td><td data-i="d5">Екі реакция теңдеуін дұрыс құрастырады.</td><td>2</td></tr>
+        <tr><td data-i="d6c">Бақылауды жазады</td><td data-i="d6">Екі тәжірибе бойынша бақылауларды дұрыс тіркейді.</td><td>1</td></tr>
+        <tr><td data-i="d7c">Қорытынды жасайды</td><td data-i="d7">Екі реакцияны салыстырып ғылыми қорытынды жасайды.</td><td>1</td></tr>
+        <tr><th colspan="2" data-i="total">Барлығы</th><th>10</th></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section grid">
+  <div class="card">
+    <div class="title"><span class="num">1</span><h2 data-i="sceneTitle">3D виртуалды зертхана</h2></div>
+    <div class="sceneShell">
+      <div id="scene3d"></div>
+      <div class="sceneOverlay">
+        <span class="chip" id="toolChip">TOOL: NONE</span>
+        <span class="chip" id="stateChip">READY</span>
+      </div>
+    </div>
+
+    <div class="controls no-print">
+      <div class="control">
+        <label data-i="safety">Қауіпсіздік</label>
+        <div class="row">
+          <button id="gogglesBtn" class="btn" type="button">🥽</button>
+          <button id="glovesBtn" class="btn" type="button">🧤</button>
+        </div>
+      </div>
+      <div class="control">
+        <label><span data-i="scale">Масштаб</span>: <strong id="scaleVal">100%</strong></label>
+        <input id="scaleSlider" type="range" min="50" max="200" step="5" value="100">
+      </div>
+      <div class="control">
+        <label data-i="camera">Камера</label>
+        <button id="resetCamera" class="btn" type="button" style="width:100%" data-i="resetCamera">Камераны қалпына келтіру</button>
+      </div>
+      <div class="control">
+        <label data-i="sceneMode">Жұмыс режимі</label>
+        <div id="modeText" class="small" data-i="manualMode">Тек қолмен басқару</div>
+      </div>
+    </div>
+
+    <div id="sceneStatus" class="status warn"></div>
+    <div class="tubeLegend">
+      <span><span class="dot" style="background:#6ec5ef"></span><strong>H₂O</strong> — <span data-i="waterTubeLabel">Су пробиркасы</span></span>
+      <span><span class="dot" style="background:#f0a07f"></span><strong>HCl</strong> — <span data-i="acidTubeLabel">Қышқыл пробиркасы</span></span>
+      <span><span class="dot" style="background:#ffffff;border:1px solid #8fa6a9"></span><strong>H₂</strong> — <span data-i="bubbleLabel">Газ көпіршіктері</span></span>
+    </div>
+    <p class="small" data-i="sceneHint">
+      Алдымен виртуалды пинцетті таңдаңыз. Содан кейін тиісті Ca үлгісін ұстап, оны тек өз пробиркасына қолмен жеткізіңіз.
+    </p>
+  </div>
+
+  <aside class="card">
+    <div class="title"><span class="num">2</span><h2 data-i="samplesTitle">Екі тәуелсіз кальций үлгісі</h2></div>
+    <div class="kpis">
+      <div><span class="small">Ca_WATER</span><b id="waterCaState">READY</b></div>
+      <div><span class="small">Ca_ACID</span><b id="acidCaState">READY</b></div>
+      <div><span class="small" data-i="toolState">Құрал</span><b id="toolState">NONE</b></div>
+    </div>
+    <div class="status" id="sampleStatus"></div>
+
+    <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+    <h3 data-i="rateTitle">Реакция қарқындылығын салыстыру</h3>
+    <div class="small">Ca + H₂O — <span data-i="moderate">орташа</span></div>
+    <div class="rate water"><div id="waterRate"></div></div>
+    <div class="small" style="margin-top:8px">Ca + HCl — <span data-i="higher">жоғарырақ</span></div>
+    <div class="rate acid"><div id="acidRate"></div></div>
+    <div class="status" id="rateStatus" data-i="rateInfo">Екі тәжірибе аяқталғаннан кейін салыстыру белсенді болады.</div>
+  </aside>
+</section>
+
+<section class="card section">
+  <div class="title"><span class="num">3</span><h2 data-i="chemTitle">Химиялық үдерістер</h2></div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th data-i="experiment">Тәжірибе</th><th data-i="equation">Реакция теңдеуі</th><th data-i="observation">Бақылау</th></tr></thead>
+      <tbody>
+        <tr><td>Ca + H₂O</td><td>Ca(s) + 2H₂O(l) → Ca(OH)₂ + H₂(g)↑</td><td data-i="waterObsHint">H₂ көпіршіктері, Ca біртіндеп азаяды, орта сілтіленеді, әлсіз лайлану мүмкін.</td></tr>
+        <tr><td>Ca + HCl</td><td>Ca(s) + 2HCl(aq) → CaCl₂(aq) + H₂(g)↑</td><td data-i="acidObsHint">H₂ қарқындырақ бөлінеді, Ca тезірек азаяды, ерітінді түссіз қалады.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="status">
+    <strong data-i="redoxTitle">Тотығу-тотықсыздану:</strong><br>
+    Ca⁰ → Ca²⁺ + 2e⁻<br>
+    2H⁺ + 2e⁻ → H₂
+  </div>
+</section>
+
+<section class="card section">
+  <div class="title"><span class="num">4</span><h2 data-i="obsTitle">Бақылау кестесі — 1 балл</h2></div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th data-i="experiment">Тәжірибе</th><th data-i="observation">Бақылау</th><th data-i="conclusion">Қорытынды</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Ca + H₂O</td>
+          <td><select id="waterObs"></select></td>
+          <td><select id="waterConclusion"></select></td>
+        </tr>
+        <tr>
+          <td>Ca + HCl</td>
+          <td><select id="acidObs"></select></td>
+          <td><select id="acidConclusion"></select></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <button id="checkObs" class="btn primary" type="button" data-i="check">Тексеру</button>
+  <div id="obsStatus" class="status hidden"></div>
+</section>
+
+<section class="card section">
+  <div class="title"><span class="num">5</span><h2 data-i="eqTitle">Реакция теңдеулерін құрастыр — 2 балл</h2></div>
+  <p class="small" data-i="eqInfo">Карточкаларды дұрыс ретпен орналастырыңыз. Телефонда: карточканы, кейін қажетті ұяшықты басыңыз.</p>
+  <div class="eqboard">
+    <div>
+      <h3>Ca + H₂O</h3>
+      <div class="bank" id="bankWater"></div>
+      <div class="slots" id="slotsWater"></div>
+    </div>
+    <div>
+      <h3>Ca + HCl</h3>
+      <div class="bank" id="bankAcid"></div>
+      <div class="slots" id="slotsAcid"></div>
+    </div>
+  </div>
+  <button id="checkEq" class="btn primary" type="button" data-i="check">Тексеру</button>
+  <div id="eqStatus" class="status hidden"></div>
+</section>
+
+<section class="card section">
+  <div class="title"><span class="num">6</span><h2 data-i="compareTitle">Реакция жылдамдығын салыстыру — 1 балл</h2></div>
+  <label data-i="compareQ">Қай реакция қарқындырақ жүреді?</label>
+  <select id="compareAnswer">
+    <option value="" data-i="choose">— таңдаңыз —</option>
+    <option value="water">Ca + H₂O</option>
+    <option value="acid">Ca + HCl</option>
+    <option value="same" data-i="same">Екеуі бірдей</option>
+  </select>
+  <textarea id="compareReason" data-ph-kz="Неліктен? Себебін жазыңыз." data-ph-ru="Почему? Объясните причину." placeholder="Неліктен? Себебін жазыңыз." style="margin-top:8px"></textarea>
+  <button id="checkCompare" class="btn primary" type="button" data-i="check">Тексеру</button>
+  <div id="compareStatus" class="status hidden"></div>
+</section>
+
+<section class="card section">
+  <div class="title"><span class="num">7</span><h2 data-i="conclusionTitle">Жалпы қорытынды — 1 балл</h2></div>
+  <div class="q"><label data-i="c1">Кальций сумен әрекеттескенде ... түзіледі.</label><input id="c1" type="text"></div>
+  <div class="q"><label data-i="c2">Кальций қышқыл ерітіндісімен әрекеттескенде ... түзіледі.</label><input id="c2" type="text"></div>
+  <div class="q"><label data-i="c3">Қышқылмен реакция сумен салыстырғанда ... жүреді.</label><input id="c3" type="text"></div>
+  <div class="q"><label data-i="c4">Екі реакцияда да бөлінетін газ — ...</label><input id="c4" type="text"></div>
+  <button id="saveConclusion" class="btn primary" type="button" data-i="save">Сақтау</button>
+  <div id="conclusionStatus" class="status hidden"></div>
+</section>
+
+<section class="card section">
+  <div class="title"><span class="num">8</span><h2 data-i="finishTitle">Нәтиже</h2></div>
+  <button id="finishLab" class="btn good" type="button" data-i="finish">Зертханалық жұмысты аяқтау</button>
+</section>
+
+<section class="card section hidden" id="resultCard">
+  <div class="title"><span class="num">✓</span><h2 data-i="resultTitle">Нәтиже</h2></div>
+  <div class="result">
+    <p><strong>Автор: НУРАЛИНА Б.А.</strong></p>
+    <div class="grid">
+      <div><div class="bigscore"><span id="scoreOut">0</span>/10</div><p id="levelOut"></p></div>
+      <div class="kpis">
+        <div><span class="small" data-i="percent">Пайыз</span><b id="percentOut">0%</b></div>
+        <div><span class="small" data-i="waterExp">Су</span><b id="waterDoneOut">○</b></div>
+        <div><span class="small" data-i="acidExp">Қышқыл</span><b id="acidDoneOut">○</b></div>
+      </div>
+    </div>
+    <div id="recommend"></div>
+  </div>
+  <div class="row no-print" style="margin-top:10px">
+    <button id="showErrors" class="btn primary" type="button" data-i="showErrors">Қателерді көру</button>
+    <button id="downloadResult" class="btn" type="button" data-i="download">Нәтижені жүктеу</button>
+    <button id="printResult" class="btn" type="button" data-i="print">Басып шығару</button>
+    <button id="restart" class="btn bad" type="button" data-i="restart">Қайта орындау</button>
+  </div>
+  <div id="errorsBox" class="status hidden"></div>
+</section>
+
+<section class="card section">
+  <div class="title"><span class="num">☎</span><h2 data-i="contactsTitle">Байланыс</h2></div>
+  <div class="contacts">
+    <div class="contactCard"><span class="contactIcon">💬</span><span>WhatsApp:</span><span class="contactValue" id="whatsappContact">+7 __________</span></div>
+    <div class="contactCard"><span class="contactIcon">✈️</span><span>Telegram:</span><span class="contactValue" id="telegramContact">@__________</span></div>
+  </div>
+  <p class="small" data-i="contactsNote">Нақты WhatsApp нөмірі мен Telegram пайдаланушы атын енгізу үшін оларды маған жіберіңіз.</p>
+</section>
+
+<footer>© НУРАЛИНА Б.А. • <span data-i="footer">Виртуалды зертхана / Виртуальная лаборатория</span></footer>
+</div>
+
+<script type="importmap">
+{"imports":{
+"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+"three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+}}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+
+const I={
+kz:{
+title:'№8 зертханалық тәжірибе',topic:'Кальцийдің сумен және қышқыл ерітіндісімен әрекеттесуі',subtitle:'Интерактивті 3D виртуалды зертхана',
+b1:'2 тәуелсіз Ca үлгісі',b2:'Қолмен 3D жылжыту',b3:'50–200% масштаб',b4:'Жалпы 10 балл',
+virtualOnly:'Бұл тек виртуалды оқу симуляциясы. Ол нақты қышқылдармен немесе басқа реактивтермен жұмыс істеуге арналған практикалық нұсқаулық емес.',
+progress:'Орындалу барысы',descTitle:'Бағалау критерийлері мен дескрипторлар',criterion:'Бағалау критерийі',descriptor:'Дескриптор',points:'Балл',total:'Барлығы',
+d1c:'Қауіпсіздік',d1:'Виртуалды қорғаныш көзілдірігі мен қолғапты таңдайды.',
+d2c:'Ca + H₂O тәжірибесі',d2:'Ca_WATER үлгісімен газ бөлінуін, Ca(OH)₂ түзілуін және индикатор түсінің өзгеруін анықтайды.',
+d3c:'Ca + HCl тәжірибесі',d3:'Ca_ACID үлгісімен H₂ бөлінуін және CaCl₂ түзілуін анықтайды.',
+d4c:'Реакция қарқындылығын салыстырады',d4:'Қышқылмен реакцияның жылдамырақ жүруін анықтап, себебін түсіндіреді.',
+d5c:'Теңдеулерді құрады',d5:'Екі реакция теңдеуін дұрыс құрастырады.',
+d6c:'Бақылауды жазады',d6:'Екі тәжірибе бойынша бақылауларды дұрыс тіркейді.',
+d7c:'Қорытынды жасайды',d7:'Екі реакцияны салыстырып ғылыми қорытынды жасайды.',
+sceneTitle:'3D виртуалды зертхана',safety:'Қауіпсіздік',scale:'Масштаб',camera:'Камера',resetCamera:'Камераны қалпына келтіру',sceneMode:'Жұмыс режимі',manualMode:'Тек қолмен басқару',
+sceneHint:'Алдымен виртуалды пинцетті таңдаңыз. Содан кейін тиісті Ca үлгісін ұстап, оны тек өз пробиркасына қолмен жеткізіңіз.',
+waterTubeLabel:'Су пробиркасы',acidTubeLabel:'Қышқыл пробиркасы',bubbleLabel:'Газ көпіршіктері',
+contactsTitle:'Байланыс',contactsNote:'Нақты WhatsApp нөмірі мен Telegram пайдаланушы атын енгізу үшін оларды маған жіберіңіз.',
+samplesTitle:'Екі тәуелсіз кальций үлгісі',toolState:'Құрал',rateTitle:'Реакция қарқындылығын салыстыру',moderate:'орташа',higher:'жоғарырақ',rateInfo:'Екі тәжірибе аяқталғаннан кейін салыстыру белсенді болады.',
+chemTitle:'Химиялық үдерістер',experiment:'Тәжірибе',equation:'Реакция теңдеуі',observation:'Бақылау',conclusion:'Қорытынды',
+waterObsHint:'H₂ көпіршіктері, Ca біртіндеп азаяды, орта сілтіленеді, әлсіз лайлану мүмкін.',acidObsHint:'H₂ қарқындырақ бөлінеді, Ca тезірек азаяды, ерітінді түссіз қалады.',redoxTitle:'Тотығу-тотықсыздану:',
+obsTitle:'Бақылау кестесі — 1 балл',check:'Тексеру',eqTitle:'Реакция теңдеулерін құрастыр — 2 балл',eqInfo:'Карточкаларды дұрыс ретпен орналастырыңыз. Телефонда: карточканы, кейін қажетті ұяшықты басыңыз.',
+compareTitle:'Реакция жылдамдығын салыстыру — 1 балл',compareQ:'Қай реакция қарқындырақ жүреді?',choose:'— таңдаңыз —',same:'Екеуі бірдей',
+conclusionTitle:'Жалпы қорытынды — 1 балл',c1:'Кальций сумен әрекеттескенде ... түзіледі.',c2:'Кальций қышқыл ерітіндісімен әрекеттескенде ... түзіледі.',c3:'Қышқылмен реакция сумен салыстырғанда ... жүреді.',c4:'Екі реакцияда да бөлінетін газ — ...',save:'Сақтау',
+finishTitle:'Нәтиже',finish:'Зертханалық жұмысты аяқтау',resultTitle:'Нәтиже',percent:'Пайыз',waterExp:'Су',acidExp:'Қышқыл',showErrors:'Қателерді көру',download:'Нәтижені жүктеу',print:'Басып шығару',restart:'Қайта орындау',footer:'Виртуалды зертхана',
+needSafety:'Алдымен виртуалды қорғаныш көзілдірігі мен қолғапты таңдаңыз.',safetyDone:'Қауіпсіздік шарты орындалды. Енді пинцетті таңдаңыз.',
+selectTweezers:'Пинцетті таңдаңыз, содан кейін Ca үлгісін қолмен ұстаңыз.',wrongSampleWater:'Ca_WATER үлгісі тек су тәжірибесіне арналған.',wrongSampleAcid:'Ca_ACID үлгісі тек қышқыл тәжірибесіне арналған.',
+consumed:'Бұл кальций үлгісі реакцияға түсіп болды. Келесі тәжірибе үшін екінші кальций үлгісін пайдаланыңыз.',
+heldWater:'Ca_WATER пинцетпен ұсталды. Оны H₂O пробиркасына қолмен жеткізіңіз.',heldAcid:'Ca_ACID пинцетпен ұсталды. Оны HCl пробиркасына қолмен жеткізіңіз.',
+waterStarted:'Ca_WATER су аймағына түсті: реакция басталды.',acidStarted:'Ca_ACID қышқыл аймағына түсті: реакция басталды.',
+waterComplete:'Су тәжірибесі аяқталды: Ca_WATER → CONSUMED.',acidComplete:'Қышқыл тәжірибесі аяқталды: Ca_ACID → CONSUMED.',
+pipetteReady:'Тамшуыр таңдалды. Оны су пробиркасының үстіне қолмен жеткізіп, басыңыз.',phenolBefore:'Сілтілік орта әлі түзілмеді — индикатор түсі өзгермейді.',phenolPink:'Фенолфталеин жұмсақ қызғылт түске өзгерді: орта сілтілік.',
+rateCompare:'Қышқылмен реакция қарқындырақ: H⁺ әсерінен кальций тезірек әрекеттеседі.',
+obsGood:'Бақылау кестесі дұрыс.',obsBad:'Бақылау кестесінде қате бар.',eqGood:'Екі теңдеу де дұрыс.',eqPartial:'Бір теңдеу дұрыс.',eqBad:'Теңдеулерді қайта тексеріңіз.',compareGood:'Дұрыс: Ca + HCl қарқындырақ жүреді.',compareBad:'Жауапты және түсіндірмені қайта қараңыз.',saved:'Қорытынды сақталды.',fillAll:'Барлық қорытынды жолын толтырыңыз.',
+excellent:'Өте жақсы',goodLevel:'Жақсы',repeatSome:'Кейбір бөлімдерді қайталаңыз',repeatMore:'Тақырыпты қайта қарау ұсынылады',
+recExcellent:'Екі реакцияның айырмашылығын және өнімдерін дұрыс анықтадыңыз.',recGood:'Қате бөлімдерді қайта қарап, екі реакцияның қарқындылығын салыстырыңыз.',recSome:'Реакция теңдеулерін және бақылауларды қайта орындаңыз.',recMore:'Виртуалды тәжірибені басынан кезеңмен қайталаңыз.'
+},
+ru:{
+title:'Лабораторная работа №8',topic:'Взаимодействие кальция с водой и раствором кислоты',subtitle:'Интерактивная 3D-виртуальная лаборатория',
+b1:'2 независимых образца Ca',b2:'Ручное 3D-перемещение',b3:'Масштаб 50–200%',b4:'Всего 10 баллов',
+virtualOnly:'Это только виртуальная учебная симуляция. Она не является практической инструкцией по работе с реальными кислотами или другими реактивами.',
+progress:'Прогресс',descTitle:'Критерии оценивания и дескрипторы',criterion:'Критерий',descriptor:'Дескриптор',points:'Балл',total:'Итого',
+d1c:'Безопасность',d1:'Выбирает виртуальные защитные очки и перчатки.',
+d2c:'Опыт Ca + H₂O',d2:'С образцом Ca_WATER определяет выделение газа, образование Ca(OH)₂ и изменение индикатора.',
+d3c:'Опыт Ca + HCl',d3:'С образцом Ca_ACID определяет выделение H₂ и образование CaCl₂.',
+d4c:'Сравнивает интенсивность реакций',d4:'Определяет, что реакция с кислотой идёт быстрее, и объясняет причину.',
+d5c:'Составляет уравнения',d5:'Правильно составляет два уравнения реакций.',
+d6c:'Записывает наблюдения',d6:'Правильно фиксирует наблюдения по двум опытам.',
+d7c:'Формулирует вывод',d7:'Сравнивает две реакции и формулирует научный вывод.',
+sceneTitle:'3D-виртуальная лаборатория',safety:'Безопасность',scale:'Масштаб',camera:'Камера',resetCamera:'Сбросить камеру',sceneMode:'Режим работы',manualMode:'Только ручное управление',
+sceneHint:'Сначала выберите виртуальный пинцет. Затем вручную захватите нужный образец Ca и перенесите его только в соответствующую пробирку.',
+waterTubeLabel:'Пробирка с водой',acidTubeLabel:'Пробирка с кислотой',bubbleLabel:'Пузырьки газа',
+contactsTitle:'Контакты',contactsNote:'Пришлите мне ваш номер WhatsApp и имя пользователя Telegram, и я вставлю их сюда без заглушек.',
+samplesTitle:'Два независимых образца кальция',toolState:'Инструмент',rateTitle:'Сравнение интенсивности реакций',moderate:'умеренная',higher:'выше',rateInfo:'Сравнение станет активным после завершения обоих опытов.',
+chemTitle:'Химические процессы',experiment:'Опыт',equation:'Уравнение реакции',observation:'Наблюдение',conclusion:'Вывод',
+waterObsHint:'Пузырьки H₂, Ca постепенно расходуется, среда становится щелочной, возможно лёгкое помутнение.',acidObsHint:'H₂ выделяется интенсивнее, Ca уменьшается быстрее, раствор остаётся бесцветным.',redoxTitle:'Окислительно-восстановительный процесс:',
+obsTitle:'Таблица наблюдений — 1 балл',check:'Проверить',eqTitle:'Собери уравнения реакций — 2 балла',eqInfo:'Расположите карточки в правильном порядке. На телефоне: нажмите карточку, затем нужную ячейку.',
+compareTitle:'Сравнение скорости реакций — 1 балл',compareQ:'Какая реакция протекает интенсивнее?',choose:'— выберите —',same:'Одинаково',
+conclusionTitle:'Общий вывод — 1 балл',c1:'При взаимодействии кальция с водой образуются ...',c2:'При взаимодействии кальция с раствором кислоты образуются ...',c3:'Реакция с кислотой по сравнению с водой протекает ...',c4:'Газ, выделяющийся в обеих реакциях, — ...',save:'Сохранить',
+finishTitle:'Результат',finish:'Завершить лабораторную работу',resultTitle:'Результат',percent:'Процент',waterExp:'Вода',acidExp:'Кислота',showErrors:'Посмотреть ошибки',download:'Скачать результат',print:'Распечатать',restart:'Повторить',footer:'Виртуальная лаборатория',
+needSafety:'Сначала выберите виртуальные защитные очки и перчатки.',safetyDone:'Условие безопасности выполнено. Теперь выберите пинцет.',
+selectTweezers:'Выберите пинцет, затем вручную захватите образец Ca.',wrongSampleWater:'Образец Ca_WATER предназначен только для опыта с водой.',wrongSampleAcid:'Образец Ca_ACID предназначен только для опыта с кислотой.',
+consumed:'Этот образец кальция уже прореагировал. Для следующего опыта используйте второй образец кальция.',
+heldWater:'Ca_WATER захвачен пинцетом. Вручную перенесите его в пробирку H₂O.',heldAcid:'Ca_ACID захвачен пинцетом. Вручную перенесите его в пробирку HCl.',
+waterStarted:'Ca_WATER попал в зону воды: реакция началась.',acidStarted:'Ca_ACID попал в зону кислоты: реакция началась.',
+waterComplete:'Опыт с водой завершён: Ca_WATER → CONSUMED.',acidComplete:'Опыт с кислотой завершён: Ca_ACID → CONSUMED.',
+pipetteReady:'Капельница выбрана. Вручную переместите её над пробиркой с водой и нажмите.',phenolBefore:'Щелочная среда ещё не образовалась — цвет индикатора не меняется.',phenolPink:'Фенолфталеин стал мягко-розовым: среда щелочная.',
+rateCompare:'С кислотой реакция интенсивнее: присутствие H⁺ ускоряет взаимодействие кальция.',
+obsGood:'Таблица наблюдений заполнена верно.',obsBad:'В таблице наблюдений есть ошибки.',eqGood:'Оба уравнения составлены верно.',eqPartial:'Одно уравнение составлено верно.',eqBad:'Проверьте уравнения ещё раз.',compareGood:'Верно: Ca + HCl протекает интенсивнее.',compareBad:'Пересмотрите ответ и объяснение.',saved:'Вывод сохранён.',fillAll:'Заполните все строки вывода.',
+excellent:'Отлично',goodLevel:'Хорошо',repeatSome:'Повторите отдельные разделы',repeatMore:'Рекомендуется повторить тему',
+recExcellent:'Вы правильно определили продукты и различия двух реакций.',recGood:'Повторите ошибочные разделы и сравнение интенсивности реакций.',recSome:'Повторите уравнения и наблюдения.',recMore:'Пройдите виртуальный опыт заново по этапам.'
+}};
+
+let lang='kz';
+const tr=k=>I[lang][k]??k;
+
+const state={
+goggles:false,gloves:false,tool:'NONE',
+water:{state:'READY',progress:0,done:false,phenol:false},
+acid:{state:'READY',progress:0,done:false},
+obs:false,eqWater:false,eqAcid:false,compare:false,conclusion:false,score:0,errors:[]
+};
+
+function applyLang(){
+ document.documentElement.lang=lang==='kz'?'kk':'ru';
+ $$('[data-i]').forEach(el=>el.textContent=tr(el.dataset.i));
+ $('#kzBtn').classList.toggle('active',lang==='kz');$('#ruBtn').classList.toggle('active',lang==='ru');
+ $('#compareReason').placeholder=$('#compareReason').dataset[lang==='kz'?'phKz':'phRu'];
+ buildObsOptions();updateAllUI();
+}
+$('#kzBtn').addEventListener('click',()=>{lang='kz';applyLang()});
+$('#ruBtn').addEventListener('click',()=>{lang='ru';applyLang()});
+
+function show(msg,type=''){
+ const b=$('#sceneStatus');b.className='status '+type;b.textContent=msg;
+}
+
+// ------------- 3D -------------
+const container=$('#scene3d');
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0xdeefec);
+scene.fog=new THREE.Fog(0xdeefec,18,30);
+
+const camera=new THREE.PerspectiveCamera(46,1,.1,100);
+const initialCamera=new THREE.Vector3(9.2,8.1,13.2);
+camera.position.copy(initialCamera);
+
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.8));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+container.appendChild(renderer.domElement);
+
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.target.set(0,1.0,0);controls.enableDamping=true;controls.minDistance=7;controls.maxDistance=25;controls.maxPolarAngle=Math.PI/2.05;
+
+scene.add(new THREE.HemisphereLight(0xffffff,0x607875,1.35));
+const key=new THREE.DirectionalLight(0xffffff,1.25);key.position.set(6,11,8);key.castShadow=true;key.shadow.mapSize.set(1024,1024);scene.add(key);
+
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(34,25),new THREE.MeshStandardMaterial({color:0xc9ddda,roughness:.95}));
+floor.rotation.x=-Math.PI/2;floor.position.y=-.3;floor.receiveShadow=true;scene.add(floor);
+
+const table=new THREE.Mesh(new THREE.BoxGeometry(13,.5,7.5),new THREE.MeshStandardMaterial({color:0xf3f4ef,roughness:.72}));
+table.position.y=0;table.castShadow=true;table.receiveShadow=true;scene.add(table);
+
+function textSprite(text,bg='#fff',fg='#183b3f',scale=1){
+ const c=document.createElement('canvas');c.width=512;c.height=150;const x=c.getContext('2d');
+ x.fillStyle=bg;x.fillRect(0,0,c.width,c.height);x.strokeStyle='#6fae9f';x.lineWidth=7;x.strokeRect(4,4,c.width-8,c.height-8);
+ x.fillStyle=fg;x.font='bold 52px Segoe UI,Arial';x.textAlign='center';x.textBaseline='middle';x.fillText(text,256,75);
+ const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;
+ const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true}));s.scale.set(1.55*scale,.45*scale,1);return s;
+}
+const interactives=[];
+function reg(g,action,data={}){
+ g.traverse(o=>{if(o.isMesh){o.userData.action=action;Object.assign(o.userData,data);interactives.push(o)}});
+}
+
+function createRack(){
+ const g=new THREE.Group();g.position.set(0,.28,.25);
+ const mat=new THREE.MeshStandardMaterial({color:0xd7e0df,metalness:.15,roughness:.55});
+ const base=new THREE.Mesh(new THREE.BoxGeometry(6.6,.18,1.7),mat);g.add(base);
+ const top=new THREE.Mesh(new THREE.BoxGeometry(6.6,.16,1.7),mat);top.position.y=1.35;g.add(top);
+ for(const x of [-3.0,3.0]){const p=new THREE.Mesh(new THREE.BoxGeometry(.18,1.35,.18),mat);p.position.set(x,.67,0);g.add(p)}
+ scene.add(g);return g;
+}
+createRack();
+
+function makeTube(x,label,liquidColor,accentColor){
+ const g=new THREE.Group();g.position.set(x,1.25,.15);
+ const glass=new THREE.MeshPhysicalMaterial({color:0xe9fbff,transparent:true,opacity:.34,roughness:.04,clearcoat:1,transmission:.18,thickness:.18,side:THREE.DoubleSide});
+ const tube=new THREE.Mesh(new THREE.CylinderGeometry(.68,.56,3.35,40,1,true),glass);tube.castShadow=true;g.add(tube);
+ const bottom=new THREE.Mesh(new THREE.SphereGeometry(.56,36,22,0,Math.PI*2,Math.PI/2,Math.PI/2),glass);bottom.position.y=-1.68;g.add(bottom);
+ const rim=new THREE.Mesh(new THREE.TorusGeometry(.68,.055,12,40),new THREE.MeshStandardMaterial({color:accentColor,metalness:.08,roughness:.35}));rim.rotation.x=Math.PI/2;rim.position.y=1.68;g.add(rim);
+ const liquidMat=new THREE.MeshPhysicalMaterial({color:liquidColor,transparent:true,opacity:.58,roughness:.05,transmission:.2});
+ const liquid=new THREE.Mesh(new THREE.CylinderGeometry(.48,.48,1.9,36),liquidMat);liquid.position.y=-.55;g.add(liquid);
+ const baseRing=new THREE.Mesh(new THREE.TorusGeometry(.52,.045,10,36),new THREE.MeshBasicMaterial({color:accentColor}));baseRing.rotation.x=Math.PI/2;baseRing.position.y=-1.35;g.add(baseRing);
+ const lab=textSprite(label,'#ffffff','#173b40',1.25);lab.position.set(0,2.25,0);g.add(lab);
+ scene.add(g);return {g,liquid,liquidMat,rim,baseRing};
+}
+const waterTube=makeTube(-2.25,'H₂O',0x93dcff,0x3b9fd3);
+const acidTube=makeTube(2.25,'HCl',0xf7ece8,0xe87955);
+
+// Two physically independent Ca pieces
+function makeCalcium(x,z,label,id){
+ const g=new THREE.Group();g.position.set(x,.58,z);
+ const geom=new THREE.IcosahedronGeometry(.32,2);
+ const mat=new THREE.MeshStandardMaterial({color:0xa9afb2,metalness:.62,roughness:.5});
+ const m=new THREE.Mesh(geom,mat);m.scale.set(1.25,.65,.9);m.rotation.set(.28,.55,.12);m.castShadow=true;g.add(m);
+ const lab=textSprite(label,'#f7fbfb','#173b40',.72);lab.position.set(0,.75,0);g.add(lab);
+ scene.add(g);reg(g,'calcium',{sampleId:id});return {g,mesh:m,home:g.position.clone(),id};
+}
+const calciumWaterSample=makeCalcium(-4.5,2.25,'Ca_WATER','water');
+const calciumAcidSample=makeCalcium(-3.15,2.25,'Ca_ACID','acid');
+
+// tweezers
+const tweezers=new THREE.Group();tweezers.position.set(3.8,.58,2.0);
+const tmat=new THREE.MeshStandardMaterial({color:0x8e989b,metalness:.82,roughness:.22});
+for(const z of [-.07,.07]){
+ const arm=new THREE.Mesh(new THREE.BoxGeometry(1.7,.05,.06),tmat);arm.position.set(.1,0,z);arm.rotation.z=-.07; tweezers.add(arm);
+}
+const tlab=textSprite(lang==='kz'?'ПИНЦЕТ':'TWEEZERS','#eef7f6','#173b40',.62);tlab.position.set(0,.62,0);tweezers.add(tlab);
+scene.add(tweezers);reg(tweezers,'tweezers');
+
+// goggles + gloves
+const goggles=new THREE.Group();goggles.position.set(4.8,.48,-1.8);
+const frame=new THREE.MeshStandardMaterial({color:0x2b78a8,metalness:.15,roughness:.35});
+const lens=new THREE.MeshPhysicalMaterial({color:0xaadeff,transparent:true,opacity:.4,roughness:.1});
+[-.35,.35].forEach(x=>{const fr=new THREE.Mesh(new THREE.TorusGeometry(.25,.05,10,24),frame);fr.scale.y=.72;fr.position.x=x;goggles.add(fr);const ln=new THREE.Mesh(new THREE.CircleGeometry(.21,24),lens);ln.position.set(x,0,.02);goggles.add(ln)});
+goggles.rotation.x=-Math.PI/2;scene.add(goggles);reg(goggles,'goggles');
+
+const gloves=new THREE.Group();gloves.position.set(4.7,.48,-.3);
+for(const x of [-.25,.25]){const palm=new THREE.Mesh(new THREE.SphereGeometry(.23,18,14),new THREE.MeshStandardMaterial({color:0x2f9f8f,roughness:.5}));palm.scale.set(.8,.35,1.2);palm.position.x=x;gloves.add(palm)}
+scene.add(gloves);reg(gloves,'gloves');
+
+// phenolphthalein bottle + pipette
+const phenBottle=new THREE.Group();phenBottle.position.set(3.4,.62,-1.5);
+const pbMat=new THREE.MeshPhysicalMaterial({color:0xeefbff,transparent:true,opacity:.35,roughness:.08});
+const pb=new THREE.Mesh(new THREE.CylinderGeometry(.38,.42,.92,24),pbMat);phenBottle.add(pb);
+const pbl=textSprite('Phenolphthalein','#fff0f5','#a6426a',.68);pbl.position.set(0,.75,0);phenBottle.add(pbl);scene.add(phenBottle);
+
+const pipette=new THREE.Group();pipette.position.set(3.2,.72,.7);
+const tubeP=new THREE.Mesh(new THREE.CylinderGeometry(.055,.055,1.55,14),new THREE.MeshPhysicalMaterial({color:0xdff8ff,transparent:true,opacity:.5,roughness:.06}));tubeP.rotation.z=Math.PI/2;pipette.add(tubeP);
+const bulb=new THREE.Mesh(new THREE.SphereGeometry(.17,18,14),new THREE.MeshStandardMaterial({color:0xe3a2b8,roughness:.55}));bulb.position.x=-.82;pipette.add(bulb);
+scene.add(pipette);reg(pipette,'pipette');
+
+// reaction bubbles
+const bubbleMat=new THREE.MeshPhysicalMaterial({color:0xffffff,transparent:true,opacity:.45,roughness:.02,transmission:.6});
+const bubbles={water:[],acid:[]};
+function spawnBubble(type){
+ const tube=type==='water'?waterTube:acidTube;
+ const radius=type==='water' ? (.075+Math.random()*.035) : (.09+Math.random()*.05);
+ const group=new THREE.Group();
+ const b=new THREE.Mesh(new THREE.SphereGeometry(radius,16,12),bubbleMat);group.add(b);
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(radius*1.05,radius*.12,8,20),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.92}));
+ ring.rotation.x=Math.PI/2;group.add(ring);
+ group.position.set(tube.g.position.x+(Math.random()-.5)*.34,.05+(Math.random()*.22),tube.g.position.z+(Math.random()-.5)*.22);
+ group.userData.life=0;group.userData.type=type;scene.add(group);bubbles[type].push(group);
+}
+
+// zones visual guides
+function ring(x,z,color){
+ const m=new THREE.Mesh(new THREE.RingGeometry(.72,.96,40),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.28,side:THREE.DoubleSide,depthWrite:false}));
+ m.rotation.x=-Math.PI/2;m.position.set(x,.25,z);scene.add(m);return m;
+}
+ring(waterTube.g.position.x,waterTube.g.position.z,0x4d9fd2);
+ring(acidTube.g.position.x,acidTube.g.position.z,0xe37f5a);
+
+// drag state
+const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2(),dragPlane=new THREE.Plane(new THREE.Vector3(0,1,0),-.6);
+let dragging=null,heldSample=null;
+function ndc(e){const r=renderer.domElement.getBoundingClientRect();pointer.x=((e.clientX-r.left)/r.width)*2-1;pointer.y=-((e.clientY-r.top)/r.height)*2+1;raycaster.setFromCamera(pointer,camera)}
+function pick(e){ndc(e);return raycaster.intersectObjects(interactives,false)[0]?.object||null}
+function safetyOK(){return state.goggles&&state.gloves}
+function currentSample(id){return id==='water'?calciumWaterSample:calciumAcidSample}
+function sampleState(id){return state[id]}
+function sampleConsumed(id){return state[id].state==='CONSUMED'}
+
+renderer.domElement.addEventListener('pointerdown',e=>{
+ const o=pick(e);if(!o)return;
+ const action=o.userData.action;
+ if(action==='goggles'){state.goggles=true;updateAllUI();show(safetyOK()?tr('safetyDone'):tr('needSafety'),'good');return}
+ if(action==='gloves'){state.gloves=true;updateAllUI();show(safetyOK()?tr('safetyDone'):tr('needSafety'),'good');return}
+ if(action==='tweezers'){state.tool='TWEEZERS';updateAllUI();show(tr('selectTweezers'),'good');return}
+ if(action==='pipette'){state.tool='PIPETTE';dragging='pipette';controls.enabled=false;renderer.domElement.setPointerCapture(e.pointerId);show(tr('pipetteReady'),'good');return}
+ if(action==='calcium'){
+   const id=o.userData.sampleId;
+   if(!safetyOK()){show(tr('needSafety'),'warn');return}
+   if(state.tool!=='TWEEZERS'){show(tr('selectTweezers'),'warn');return}
+   if(sampleConsumed(id)){show(tr('consumed'),'warn');return}
+   dragging=id;heldSample=id;state[id].state='HELD';controls.enabled=false;renderer.domElement.setPointerCapture(e.pointerId);
+   show(id==='water'?tr('heldWater'):tr('heldAcid'),'good');updateAllUI();return;
+ }
+});
+
+renderer.domElement.addEventListener('pointermove',e=>{
+ if(!dragging)return;
+ ndc(e);const p=new THREE.Vector3();if(!raycaster.ray.intersectPlane(dragPlane,p))return;
+ if(dragging==='pipette'){
+   pipette.position.x=THREE.MathUtils.clamp(p.x,-5.4,5.4);pipette.position.z=THREE.MathUtils.clamp(p.z,-2.7,2.7);
+   pipette.position.y=.88;
+ }else{
+   const sample=currentSample(dragging);
+   sample.g.position.x=THREE.MathUtils.clamp(p.x,-5.4,5.4);sample.g.position.z=THREE.MathUtils.clamp(p.z,-2.7,2.7);sample.g.position.y=.9;
+   tweezers.position.set(sample.g.position.x-.7,1.05,sample.g.position.z);
+ }
+});
+
+renderer.domElement.addEventListener('pointerup',e=>{
+ if(!dragging)return;
+ if(dragging==='pipette'){
+   tryPhenolphthalein();
+ }else{
+   tryDropSample(dragging);
+ }
+ dragging=null;heldSample=null;controls.enabled=true;
+ try{renderer.domElement.releasePointerCapture(e.pointerId)}catch{}
+});
+
+function distXZ(a,b){return Math.hypot(a.x-b.x,a.z-b.z)}
+function tryDropSample(id){
+ const s=currentSample(id),dWater=distXZ(s.g.position,waterTube.g.position),dAcid=distXZ(s.g.position,acidTube.g.position);
+ if(id==='water'&&dWater<.9){startReaction('water');return}
+ if(id==='acid'&&dAcid<.9){startReaction('acid');return}
+ if(id==='water'&&dAcid<.9){show(tr('wrongSampleWater'),'warn');returnSample(id);return}
+ if(id==='acid'&&dWater<.9){show(tr('wrongSampleAcid'),'warn');returnSample(id);return}
+ returnSample(id);
+}
+function returnSample(id){
+ const s=currentSample(id);
+ s.g.position.copy(s.home);state[id].state=state[id].progress>0?'PARTLY_REACTED':'READY';updateAllUI();
+}
+function startReaction(type){
+ const s=currentSample(type),st=state[type];
+ if(st.state==='CONSUMED'){show(tr('consumed'),'warn');return}
+ st.state='IN_REACTION_ZONE';s.g.position.set((type==='water'?waterTube:acidTube).g.position.x,.22,(type==='water'?waterTube:acidTube).g.position.z);
+ st.state='REACTING';
+ show(type==='water'?tr('waterStarted'):tr('acidStarted'),'good');updateAllUI();
+}
+function tryPhenolphthalein(){
+ const d=distXZ(pipette.position,waterTube.g.position);
+ if(d<1.0){
+   if(state.water.progress<.55){show(tr('phenolBefore'),'warn');}
+   else{state.water.phenol=true;waterTube.liquidMat.color.set(0xf4a7c3);show(tr('phenolPink'),'good');updateAllUI()}
+ }
+ pipette.position.set(3.2,.72,.7);
+}
+
+// UI buttons duplicate clicking objects for accessibility, but do not move/react automatically
+$('#gogglesBtn').addEventListener('click',()=>{state.goggles=true;updateAllUI();show(safetyOK()?tr('safetyDone'):tr('needSafety'),'good')});
+$('#glovesBtn').addEventListener('click',()=>{state.gloves=true;updateAllUI();show(safetyOK()?tr('safetyDone'):tr('needSafety'),'good')});
+
+$('#resetCamera').addEventListener('click',()=>{camera.position.copy(initialCamera);controls.target.set(0,.6,0);controls.update();$('#scaleSlider').value=100;$('#scaleVal').textContent='100%'});
+$('#scaleSlider').addEventListener('input',e=>{const v=+e.target.value;$('#scaleVal').textContent=v+'%';const dir=camera.position.clone().sub(controls.target).normalize();const d=THREE.MathUtils.clamp(14*(100/v),7,25);camera.position.copy(controls.target.clone().add(dir.multiplyScalar(d)));controls.update()});
+
+// click in scene for selecting tools
+renderer.domElement.addEventListener('dblclick',e=>{
+ const o=pick(e);if(!o)return;
+ if(o.userData.action==='tweezers'){state.tool='TWEEZERS';show(tr('selectTweezers'),'good');updateAllUI()}
+ if(o.userData.action==='pipette'){state.tool='PIPETTE';show(tr('pipetteReady'),'good');updateAllUI()}
+});
+
+// reaction animation
+let last=performance.now(),bubbleAcc={water:0,acid:0};
+function tickReaction(dt,type){
+ const st=state[type],sample=currentSample(type);
+ if(st.state!=='REACTING')return;
+ const rate=type==='water'?.045:.11; // acid intentionally faster
+ st.progress=Math.min(1,st.progress+rate*dt);
+ const scale=Math.max(.08,1-st.progress*.92);
+ sample.mesh.scale.set(1.25*scale,.65*scale,.9*scale);
+ bubbleAcc[type]+=dt*(type==='water'?4.2:10.5);
+ while(bubbleAcc[type]>1){bubbleAcc[type]-=1;spawnBubble(type)}
+ if(type==='water'&&st.progress>.35) waterTube.liquidMat.opacity=.46;
+ if(st.progress>=1){
+   st.state='CONSUMED';st.done=true;sample.g.visible=false;
+   show(type==='water'?tr('waterComplete'):tr('acidComplete'),'good');updateAllUI();
+   if(state.water.done&&state.acid.done){$('#rateStatus').textContent=tr('rateCompare');$('#rateStatus').className='status good'}
+ }
+}
+function updateBubbles(dt){
+ for(const type of ['water','acid']){
+   const arr=bubbles[type];
+   for(let i=arr.length-1;i>=0;i--){
+     const b=arr[i];b.position.y+=dt*(type==='water'?.52:.72);b.userData.life+=dt;
+     if(b.userData.life>2.4){scene.remove(b);arr.splice(i,1)}
+   }
+ }
+}
+function updateRates(){
+ $('#waterRate').style.width=(state.water.progress*65)+'%';
+ $('#acidRate').style.width=(state.acid.progress*100)+'%';
+}
+
+// ---------- observation ----------
+const obsOptions={
+kz:{
+waterObs:['— таңдаңыз —','H₂ баяуырақ бөлінеді, Ca біртіндеп азаяды, орта сілтіленеді','Ерітінді көк түске боялады','Газ бөлінбейді'],
+waterCon:['— таңдаңыз —','Ca(OH)₂ және H₂ түзіледі','CaCl₂ және H₂ түзіледі','CaO түзіледі'],
+acidObs:['— таңдаңыз —','H₂ қарқынды бөлінеді, Ca тезірек азаяды, ерітінді түссіз қалады','Ерітінді күлгін болады','Газ бөлінбейді'],
+acidCon:['— таңдаңыз —','CaCl₂ және H₂ түзіледі','Ca(OH)₂ және H₂ түзіледі','Cl₂ түзіледі']
+},
+ru:{
+waterObs:['— выберите —','H₂ выделяется умеренно, Ca постепенно уменьшается, среда становится щелочной','Раствор становится синим','Газ не выделяется'],
+waterCon:['— выберите —','Образуются Ca(OH)₂ и H₂','Образуются CaCl₂ и H₂','Образуется CaO'],
+acidObs:['— выберите —','H₂ выделяется интенсивно, Ca уменьшается быстрее, раствор остаётся бесцветным','Раствор становится фиолетовым','Газ не выделяется'],
+acidCon:['— выберите —','Образуются CaCl₂ и H₂','Образуются Ca(OH)₂ и H₂','Образуется Cl₂']
+}};
+function setSelect(id,arr){$(id).innerHTML=arr.map((x,i)=>`<option value="${i}">${x}</option>`).join('')}
+function buildObsOptions(){const o=obsOptions[lang];setSelect('#waterObs',o.waterObs);setSelect('#waterConclusion',o.waterCon);setSelect('#acidObs',o.acidObs);setSelect('#acidConclusion',o.acidCon)}
+$('#checkObs').addEventListener('click',()=>{
+ state.obs=$('#waterObs').value==='1'&&$('#waterConclusion').value==='1'&&$('#acidObs').value==='1'&&$('#acidConclusion').value==='1';
+ const b=$('#obsStatus');b.classList.remove('hidden');b.className='status '+(state.obs?'good':'bad');b.textContent=state.obs?tr('obsGood'):tr('obsBad');updateProgress();
+});
+
+// ---------- equation drag/drop ----------
+const eqs={
+water:['Ca','+','2H₂O','→','Ca(OH)₂','+','H₂'],
+acid:['Ca','+','2HCl','→','CaCl₂','+','H₂']
+};
+let selectedToken=null;
+function buildEquation(kind){
+ const bank=$('#bank'+(kind==='water'?'Water':'Acid')),slots=$('#slots'+(kind==='water'?'Water':'Acid'));
+ const shuffled=[...eqs[kind]].sort(()=>Math.random()-.5);
+ bank.innerHTML=shuffled.map((t,i)=>`<span class="token" draggable="true" tabindex="0" data-kind="${kind}" data-val="${t}">${t}</span>`).join('');
+ slots.innerHTML=eqs[kind].map((_,i)=>`<div class="slot" data-kind="${kind}" data-index="${i}"></div>`).join('');
+ $$('.token',bank).forEach(t=>{
+   t.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',t.dataset.val));
+   t.addEventListener('click',()=>{selectedToken=t;$$('.token').forEach(x=>x.classList.toggle('selected',x===t))});
+ });
+ $$('.slot',slots).forEach(s=>{
+   s.addEventListener('dragover',e=>e.preventDefault());
+   s.addEventListener('drop',e=>{e.preventDefault();const v=e.dataTransfer.getData('text/plain');const tok=$(`.token[data-kind="${kind}"][data-val="${CSS.escape(v)}"]`,bank);placeToken(tok,s)});
+   s.addEventListener('click',()=>{if(selectedToken&&selectedToken.dataset.kind===kind)placeToken(selectedToken,s)});
+ });
+}
+function placeToken(tok,slot){if(!tok)return;slot.innerHTML='';slot.appendChild(tok);selectedToken=null;$$('.token').forEach(x=>x.classList.remove('selected'))}
+buildEquation('water');buildEquation('acid');
+
+$('#checkEq').addEventListener('click',()=>{
+ function check(kind){
+   const slots=$$('#slots'+(kind==='water'?'Water':'Acid')+' .slot');
+   return slots.every((s,i)=>$('.token',s)?.dataset.val===eqs[kind][i]);
+ }
+ state.eqWater=check('water');state.eqAcid=check('acid');
+ const n=(state.eqWater?1:0)+(state.eqAcid?1:0);
+ const b=$('#eqStatus');b.classList.remove('hidden');b.className='status '+(n===2?'good':n===1?'warn':'bad');b.textContent=n===2?tr('eqGood'):n===1?tr('eqPartial'):tr('eqBad');updateProgress();
+});
+
+// compare
+$('#checkCompare').addEventListener('click',()=>{
+ const reason=$('#compareReason').value.trim().toLowerCase();
+ const reasonOK=reason.length>=8 && (
+   reason.includes('h+') || reason.includes('қышқ') || reason.includes('кисл') ||
+   reason.includes('ион') || reason.includes('концент')
+ );
+ state.compare=$('#compareAnswer').value==='acid'&&reasonOK;
+ const b=$('#compareStatus');b.classList.remove('hidden');b.className='status '+(state.compare?'good':'bad');b.textContent=state.compare?tr('compareGood'):tr('compareBad');updateProgress();
+});
+
+// conclusion
+$('#saveConclusion').addEventListener('click',()=>{
+ const vals=['#c1','#c2','#c3','#c4'].map(s=>$(s).value.trim());
+ state.conclusion=vals.every(v=>v.length>=4);
+ const b=$('#conclusionStatus');b.classList.remove('hidden');b.className='status '+(state.conclusion?'good':'warn');b.textContent=state.conclusion?tr('saved'):tr('fillAll');updateProgress();
+});
+
+function updateAllUI(){
+ $('#waterCaState').textContent=state.water.state;
+ $('#acidCaState').textContent=state.acid.state;
+ $('#toolState').textContent=state.tool;
+ $('#toolChip').textContent='TOOL: '+state.tool;
+ $('#stateChip').textContent=`W:${state.water.state} | A:${state.acid.state}`;
+ $('#gogglesBtn').classList.toggle('primary',state.goggles);$('#glovesBtn').classList.toggle('primary',state.gloves);
+ $('#sampleStatus').textContent=!safetyOK()?tr('needSafety'):state.tool==='NONE'?tr('selectTweezers'):(state.water.done&&state.acid.done?tr('rateCompare'):tr('manualMode'));
+ updateRates();updateProgress();
+}
+
+function calcScore(){
+ let score=0;
+ if(safetyOK())score+=1;
+ // water experiment 2 points: reaction complete + phenolphthalein demonstrated
+ if(state.water.done)score+=1;
+ if(state.water.done&&state.water.phenol)score+=1;
+ // acid experiment 2 points: complete + correct product evidence via observation table
+ if(state.acid.done)score+=1;
+ if(state.acid.done&&state.obs)score+=1;
+ if(state.compare)score+=1;
+ if(state.eqWater)score+=1;
+ if(state.eqAcid)score+=1;
+ if(state.obs)score+=1;
+ if(state.conclusion)score+=1;
+ return Math.min(10,score);
+}
+function collectErrors(){
+ const e=[];
+ if(!safetyOK())e.push(lang==='kz'?'Қауіпсіздік толық орындалмады.':'Безопасность выполнена не полностью.');
+ if(!state.water.done)e.push(lang==='kz'?'Ca_WATER тәжірибесі аяқталмады.':'Опыт Ca_WATER не завершён.');
+ if(!state.water.phenol)e.push(lang==='kz'?'Су тәжірибесінде фенолфталеин өзгерісі көрсетілмеді.':'В опыте с водой не показано изменение фенолфталеина.');
+ if(!state.acid.done)e.push(lang==='kz'?'Ca_ACID тәжірибесі аяқталмады.':'Опыт Ca_ACID не завершён.');
+ if(!state.eqWater||!state.eqAcid)e.push(lang==='kz'?'Реакция теңдеулерінде қате бар.':'Есть ошибки в уравнениях реакций.');
+ if(!state.compare)e.push(lang==='kz'?'Реакция қарқындылығын салыстыру есептелмеді.':'Сравнение интенсивности не зачтено.');
+ if(!state.obs)e.push(lang==='kz'?'Бақылау кестесі дұрыс толтырылмады.':'Таблица наблюдений заполнена неверно.');
+ if(!state.conclusion)e.push(lang==='kz'?'Жалпы қорытынды толтырылмады.':'Общий вывод не заполнен.');
+ return e;
+}
+$('#finishLab').addEventListener('click',()=>{
+ state.score=calcScore();state.errors=collectErrors();
+ $('#scoreOut').textContent=state.score;$('#percentOut').textContent=(state.score*10)+'%';
+ $('#waterDoneOut').textContent=state.water.done?'✓':'○';$('#acidDoneOut').textContent=state.acid.done?'✓':'○';
+ let level,rec;if(state.score>=9){level=tr('excellent');rec=tr('recExcellent')}else if(state.score>=7){level=tr('goodLevel');rec=tr('recGood')}else if(state.score>=5){level=tr('repeatSome');rec=tr('recSome')}else{level=tr('repeatMore');rec=tr('recMore')}
+ $('#levelOut').innerHTML=`<strong>${level}</strong>`;$('#recommend').innerHTML=`<p>${rec}</p>`;$('#resultCard').classList.remove('hidden');$('#resultCard').scrollIntoView({behavior:'smooth'});updateProgress();
+});
+$('#showErrors').addEventListener('click',()=>{
+ const b=$('#errorsBox');b.classList.remove('hidden');b.className='status '+(state.errors.length?'warn':'good');
+ b.innerHTML=state.errors.length?'<ol>'+state.errors.map(x=>`<li>${x}</li>`).join('')+'</ol>':(lang==='kz'?'Қате жоқ.':'Ошибок нет.');
+});
+$('#downloadResult').addEventListener('click',()=>{
+ const lines=[
+   tr('title'),tr('topic'),'Автор: НУРАЛИНА Б.А.','',
+   `${tr('resultTitle')}: ${state.score}/10`,
+   `${tr('waterExp')}: ${state.water.done?'✓':'○'}`,
+   `${tr('acidExp')}: ${state.acid.done?'✓':'○'}`,'',
+   ...(state.errors.length?state.errors:[lang==='kz'?'Қате жоқ.':'Ошибок нет.'])
+ ];
+ const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=lang==='kz'?'Ca_virtual_lab_natizhe.txt':'Ca_virtual_lab_result.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+});
+$('#printResult').addEventListener('click',()=>window.print());
+$('#restart').addEventListener('click',()=>location.reload());
+
+function updateProgress(){
+ const flags=[safetyOK(),state.water.done,state.water.phenol,state.acid.done,state.obs,state.eqWater&&state.eqAcid,state.compare,state.conclusion];
+ const pct=Math.round(flags.filter(Boolean).length/flags.length*100);$('#progressFill').style.width=pct+'%';$('#progressText').textContent=pct+'%';
+}
+
+// animation
+let prev=performance.now();
+function animate(now){
+ requestAnimationFrame(animate);const dt=Math.min(.05,(now-prev)/1000);prev=now;
+ controls.update();
+ tickReaction(dt,'water');tickReaction(dt,'acid');updateBubbles(dt);updateRates();
+ renderer.render(scene,camera);
+}
+function resize(){const r=container.getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix()}
+new ResizeObserver(resize).observe(container);resize();requestAnimationFrame(animate);
+
+applyLang();buildObsOptions();updateAllUI();show(tr('needSafety'),'warn');
+</script>
+</body>
+</html>
